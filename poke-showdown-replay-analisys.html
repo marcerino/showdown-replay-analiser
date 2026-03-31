@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showdown Log Viewer</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; background-color: #f4f4f9; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+        input, select, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background-color: #2d89ef; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #1e5bb8; }
+        #output { margin-top: 20px; white-space: pre-wrap; background: #eee; padding: 15px; border-radius: 4px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Replay Log Fetcher</h2>
+    
+    <label for="urlInput">Log URL:</label>
+    <input type="text" id="urlInput" placeholder="https://replay.pokemonshowdown.com/...">
+
+    <label for="versionSelect">Select Format/Version:</label>
+    <select id="versionSelect">
+        <option value="Null"></option>
+        <option value="Season 4">Season 4</option>
+        <option value="Test">Test</option>
+    </select>
+
+    <button onclick="fetchLog()">Get Log Information</button>
+
+    <div id="output">Results will appear here...</div>
+</div>
+
+<script>
+
+    function cleanandenrichlink(replayurl){
+        replayurl = replayurl.trim();
+        if(replayurl.substring(0,"https://replay.pokemonshowdown.com/".length) != "https://replay.pokemonshowdown.com/") 
+            {
+                console.log("not valide prefix"); 
+               // throw new Error("Prefix is not \"https://replay.pokemonshowdown.com/\"!");
+            } 
+        if (replayurl.substring(replayurl.length-4,replayurl.length) != ".log")
+            {return replayurl.concat(".log"); }
+        return replayurl;
+    }
+
+    
+    async function fetchLog() {
+        const url = document.getElementById('urlInput').value;
+        const version = document.getElementById('versionSelect').value;
+        const output = document.getElementById('output');
+
+        if (!url) {
+            alert("Please paste a link first!");
+            return;
+        }
+        try {
+            url = cleanandenrichlink(url);
+        } catch (error){
+            output.innerText = "Error: URL ist nicht valide";
+            console.error(error);
+            return;
+        }
+        output.innerText = "Fetching data...";
+
+        try {
+            // Note: Direct browser fetching of other domains often hits CORS blocks.
+            // If the link is a direct .log file, we attempt to fetch it.
+            const response = await fetch(url);
+            
+            if (!response.ok) throw new Error("Could not reach the URL. Check for CORS restrictions.");
+
+            const data = await response.text();
+            
+            // Basic processing: Displaying the version selected + the log content
+            output.innerText = `[Format: ${version}]\n\n` + data;
+
+        } catch (error) {
+            output.innerText = "Error: " + error.message + 
+            "\n\nNote: Browsers often block cross-site requests (CORS). If this fails, you may need a CORS proxy or to run this on a local server.";
+        }
+    }
+</script>
+
+</body>
+</html>
