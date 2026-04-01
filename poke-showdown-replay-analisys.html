@@ -35,7 +35,7 @@
 
 <script>
     function alloccurencesof(pattern,text) {
-    var occurences = []; 
+    let occurences = []; 
     let i = 0, j=0;
     while (~(i = text.indexOf (pattern,i + pattern.length))) occurences.push(i);
     return occurences;
@@ -58,13 +58,15 @@
         const url = document.getElementById('urlInput').value;
         const version = document.getElementById('versionSelect').value;
         const output = document.getElementById('output');
+        let cleanur = "";
+        let data = "";
 
         if (!url) {
             alert("Please paste a link first!");
             return;
         }
         try {
-            var cleanurl = cleanandenrichlink(url);
+            cleanurl = cleanandenrichlink(url);
         } catch (error){
             output.innerText = "Error: URL ist nicht valide";
             console.error(error);
@@ -79,15 +81,31 @@
             
             if (!response.ok) throw new Error("Could not reach the URL. Check for CORS restrictions.");
 
-            const data = await response.text();
+            data = await response.text();
             
             // Basic processing: Displaying the version selected + the log content
-            output.innerText = `[Format: ${version}]\n\n` + data;
+            output.innerText = "Successful capture of Data, beginning Processing :)";
 
         } catch (error) {
             output.innerText = "Error: " + error.message + 
             "\n\nNote: Browsers often block cross-site requests (CORS). If this fails, you may need a CORS proxy or to run this on a local server.";
         }
+        console.log("Start of Processing");
+        let arrayofrows = data.split("\n");
+        //Beispiellink
+        //https://replay.pokemonshowdown.com/gen9natdex6v6doublesdraft-2562550639-gix165y8nt2qk0u4o5meb7bfmqv2bcfpw
+        //Beginning with ethe analisys of the content
+
+        output.innerText = arrayofrows[1];
+
+        let player1 = "player_one";
+        let player2 = "player_two";
+
+        const Team_1 = [];
+        const Team_2 = [];
+
+        const Killlist = [];
+
     }
 </script>
 
