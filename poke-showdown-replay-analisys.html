@@ -34,6 +34,12 @@
 </div>
 
 <script>
+    function alloccurencesof(pattern,text) {
+    var occurences = []; 
+    let i = 0, j=0;
+    while (~(i = text.indexOf (pattern,i + pattern.length))) occurences.push(i);
+    return occurences;
+    }
 
     function cleanandenrichlink(replayurl){
         replayurl = replayurl.trim();
