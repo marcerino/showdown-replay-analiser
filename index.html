@@ -38,41 +38,52 @@
 
     function findplayersinrows(rows) //TODO check if "|j|☆" is better than 
     {
-        let output = [];
+        let retval = [];
         let rowwithplayers =  rowswithpattern("|j|☆",rows);
-        for (let i = 0; i < rowwithplayers.length;++i);
-            {output.push(rowwithplayers[i].trim().replace("|j|☆",""));}
+        output.innerText = rowwithplayers[0];
+
+        for (let i = 0; i < rowwithplayers.length;i++)
+            {
+                retval.push(rows[rowwithplayers[i]].trim().replace("|j|☆",""));
+            }
+        return retval;
     }
+
     function rowswithpattern(pattern,rows){
-        const output = [];
+        const retval = [];
         for (let i = 0; i <rows.length;++i)
         {
-            if (rows[i].find(pattern) != -1)
-                {output.push(i);}
+            let row = rows[i] 
+            if (row.search(pattern) != -1)
+                {retval.push(i);}
         }
-        return output;
+        return retval;
     }
     function extractpokemonfromline(line){
-        return line.split("|")[3].replace(", M","").replace(", F",""); // this feels arbitrary but is due to the log beeing this format |poke|p1|Grimmsnarl, M|"
+        return line.split("|")[3].replace(", M","").replace(", F",""); // this feels magicky but is due to the log beeing this format "|poke|p1|Grimmsnarl, M|"
     }
 
     function playerteams(rows){
-        let output = [[],[]];
+        let retval = [[],[]];
         let rowsofp = rowswithpattern("|poke|",rows); //saves the index of a row not the row itself
+        console.log(rowsofp);
         //populate the teams
         for (let i = 0;i<rowsofp.length;++i)
         {
-            if (rows[rowsofp[i]].find("p1") !=-1)
-                {output[0].push(extractpokemonfromline(rows[rowsofp[i]]));} //
-            else if (rows[rowsofp[i]].find("p2") !=-1) 
-                {output[1].push(extractpokemonfromline(rows[rowsofp[i]]));}
+            if (rows[rowsofp[i]].search("p1") !=-1)
+                {retval[0].push(extractpokemonfromline(rows[rowsofp[i]]));} //
+            else if (rows[rowsofp[i]].search("p2") !=-1) 
+                {retval[1].push(extractpokemonfromline(rows[rowsofp[i]]));}
             else
                 {console.log("__func__: playerteams" ,"could not attribute the following pokemon:" , rows[rowsofp[i]] );}
         }
 
-        return output;
+        return retval;
     }
 
+    /**
+     * Returns an Array with indeces of Beginning of Pattern in  a given line
+     */  
     function alloccurencesof(pattern,text) {
         let occurences = []; 
         let i = 0, j=0;
@@ -97,13 +108,15 @@
         let outputstring = "Players: \n" + Player1 +"\n"+Player2 +"\n\n"+"Team of " + Player1 +": \n";
         for (let i = 0; i< Team1.length;i++)
         {
-            outputstring.concat(Team1[0]+"\n");
+            outputstring.concat(Team1[i]+"\n");
         }
+        outputstring.concat("\n" + "Team of "+Player2 +": \n");
         for (let i = 0; i< Team2.length;i++)
         {
-            outputstring.concat(Team2[0]);
+            outputstring.concat(Team2[i]);
         }
         //when the rest is finished it comes here.
+        return outputstring;
     }    
 
     async function main() {
@@ -165,16 +178,19 @@
         let Team_2 = [];
 
         let Killlist = [];
+        output.innerText = "Initialized the Defaults";
 
         //overwrite default playerval with the actual Name :) 
         const players = findplayersinrows(rows);
         player1 = players[0];
         player2 = players[1]; 
+        output.innerText = "Found Players";
 
         //overwrite Teams
         const Teams = playerteams(rows);
         Team_1 = Teams[0];
         Team_2 = Teams[1];
+        output.innerText = "Found Teams";
 
         let warnings = [];
         
